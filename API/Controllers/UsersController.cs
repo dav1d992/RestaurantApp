@@ -27,12 +27,12 @@ public class UsersController : BaseApiController
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
+    public async Task<ActionResult> UpdateUser(MemberDto memberDto)
     {
         var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var user = await _userRepository.GetUserByUsernameAsync(username);
 
-        _mapper.Map(memberUpdateDto, user);
+        _mapper.Map(memberDto, user);
 
         _userRepository.Update(user);
 

@@ -20,18 +20,16 @@ public class DataContext : IdentityDbContext<User, Role, int,
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<UserRole>(x => x.HasKey(y =>
-            new { y.UserId, y.RoleId }));
-
-        builder.Entity<UserRole>()
-            .HasOne(ur => ur.User)
-            .WithMany(u => u.Roles)
+        builder.Entity<User>()
+            .HasMany<UserRole>(u => u.Roles)
+            .WithOne(ur => ur.User)
+            .HasForeignKey(ur => ur.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<UserRole>()
-            .HasOne(ur => ur.Role)
-            .WithMany(r => r.UserRoles)
-            .HasForeignKey(r => r.RoleId)
+        builder.Entity<Role>()
+            .HasMany<UserRole>(r => r.UserRoles)
+            .WithOne(ur => ur.Role)
+            .HasForeignKey(ur => ur.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Order>()

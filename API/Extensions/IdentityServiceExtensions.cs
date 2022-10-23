@@ -29,7 +29,7 @@ public static class IdentityServiceExtensions
 
         services.AddAuthorization(opt =>
         {
-            opt.AddPolicy("RestaurantOwnerRole", policy => policy.RequireRole("Owner"));
+            opt.AddPolicy("RestaurantManagerRole", policy => policy.RequireRole("Manager"));
             opt.AddPolicy("WorkerRole", policy => policy.RequireRole("Worker"));
         });
 

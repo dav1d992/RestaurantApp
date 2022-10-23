@@ -1,14 +1,14 @@
 namespace API.Controllers;
 
-public class AdminController : BaseApiController
+public class ManagerController : BaseApiController
 {
     private readonly UserManager<User> _userManager;
-    public AdminController(UserManager<User> userManager)
+    public ManagerController(UserManager<User> userManager)
     {
         _userManager = userManager;
     }
 
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RestaurantManagerRole")]
     [HttpGet("users-with-roles")]
     public async Task<ActionResult> GetUsersWithRoles()
     {
@@ -27,7 +27,7 @@ public class AdminController : BaseApiController
         return Ok(users);
     }
 
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RestaurantManagerRole")]
     [HttpPost("edit-roles/{username}")]
     public async Task<ActionResult> EditRoles(string username, [FromQuery] string roles)
     {
@@ -48,12 +48,5 @@ public class AdminController : BaseApiController
         if (!result.Succeeded) return BadRequest("Failed to remove from roles");
 
         return Ok(await _userManager.GetRolesAsync(user));
-    }
-
-    [Authorize(Policy = "ModeratePhotoRole")]
-    [HttpGet("photos-to-moderate")]
-    public ActionResult GetPhotosForModeration()
-    {
-        return Ok("Admins or moderators can see this");
     }
 }

@@ -11,11 +11,10 @@ public class Seed
         var users = JsonSerializer.Deserialize<List<User>>(userData);
         if (users == null) return;
 
-        Console.WriteLine(users);
         var roles = new List<Role>
             {
                 new Role{Name = "Member"},
-                new Role{Name = "Admin"},
+                new Role{Name = "Manager"},
                 new Role{Name = "Worker"},
             };
 
@@ -24,25 +23,11 @@ public class Seed
             await roleManager.CreateAsync(role);
         }
 
-        // foreach (var user in users)
-        // {
-        //     user.UserName = user.UserName.ToLower();
-        //     await userManager.CreateAsync(user, "Pa$$w0rd");
-        //     await userManager.AddToRoleAsync(user, "Member");
-        // }
-
         foreach (var user in users)
         {
-            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            IdentityResult result01 = await userManager.CreateAsync(user, "Pa$$w0rd");
-            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-
-            if (result01.Succeeded)
-            {
-                var normalUser = await userManager.FindByNameAsync(user.UserName);
-                userManager.AddToRoleAsync(normalUser, "Member").Wait();
-            }
+            user.UserName = user.UserName.ToLower();
+            await userManager.CreateAsync(user, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(user, "Member");
         }
 
         var admin = new User
@@ -53,4 +38,7 @@ public class Seed
         await userManager.CreateAsync(admin, "Pa$$w0rd");
         await userManager.AddToRolesAsync(admin, new[] { "Admin" });
     }
+
+
+
 }
