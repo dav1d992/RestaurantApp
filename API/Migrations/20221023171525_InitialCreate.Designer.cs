@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221021214146_InitialCreateAnother223")]
-    partial class InitialCreateAnother223
+    [Migration("20221023171525_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,7 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Menu", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -99,6 +100,7 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Order", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comment")
@@ -113,10 +115,15 @@ namespace API.Migrations
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("RestaurantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Table")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
 
                     b.ToTable("Orders");
                 });
@@ -155,20 +162,25 @@ namespace API.Migrations
                     b.Property<string>("ImageURL")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("MenuId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("NumberOfTables")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Restaurants");
                 });
@@ -203,12 +215,10 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.User", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("AddressId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -266,8 +276,6 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -286,9 +294,14 @@ namespace API.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
@@ -377,27 +390,18 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("API.Models.Menu", b =>
-                {
-                    b.HasOne("API.Models.Restaurant", null)
-                        .WithOne("Menu")
-                        .HasForeignKey("API.Models.Menu", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("API.Models.MenuItem", b =>
                 {
                     b.HasOne("API.Models.Category", "Category")
                         .WithMany("MenuItems")
                         .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Models.OrderLine", null)
                         .WithOne("MenuItem")
                         .HasForeignKey("API.Models.MenuItem", "Id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Models.Menu", null)
@@ -413,9 +417,7 @@ namespace API.Migrations
                 {
                     b.HasOne("API.Models.Restaurant", null)
                         .WithMany("Orders")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RestaurantId");
                 });
 
             modelBuilder.Entity("API.Models.OrderLine", b =>
@@ -423,7 +425,7 @@ namespace API.Migrations
                     b.HasOne("API.Models.Order", null)
                         .WithMany("OrderLines")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("API.Models.Restaurant", b =>
@@ -432,26 +434,19 @@ namespace API.Migrations
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("API.Models.User", null)
-                        .WithMany("Restaurants")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("API.Models.User", b =>
-                {
-                    b.HasOne("API.Models.Address", "Address")
+                    b.HasOne("API.Models.Menu", "Menu")
                         .WithMany()
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("MenuId");
 
-                    b.HasOne("API.Models.Restaurant", null)
-                        .WithOne("Owner")
-                        .HasForeignKey("API.Models.User", "Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasOne("API.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
 
                     b.Navigation("Address");
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("API.Models.UserRole", b =>
@@ -459,14 +454,19 @@ namespace API.Migrations
                     b.HasOne("API.Models.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Models.User", "User")
                         .WithMany("Roles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Role");
 
@@ -531,11 +531,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Restaurant", b =>
                 {
-                    b.Navigation("Menu");
-
                     b.Navigation("Orders");
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("API.Models.Role", b =>
@@ -545,8 +541,6 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.User", b =>
                 {
-                    b.Navigation("Restaurants");
-
                     b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618

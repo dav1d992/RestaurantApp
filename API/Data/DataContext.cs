@@ -20,18 +20,19 @@ public class DataContext : IdentityDbContext<User, Role, int,
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<User>()
-            .HasMany<UserRole>(u => u.Roles)
-            .WithOne(ur => ur.User)
-            .HasForeignKey(ur => ur.UserId)
+        builder.Entity<UserRole>(x => x.HasKey(y =>
+            new { y.UserId, y.RoleId }));
+
+        builder.Entity<UserRole>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.Roles)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<Role>()
-            .HasMany<UserRole>(r => r.UserRoles)
-            .WithOne(ur => ur.Role)
-            .HasForeignKey(ur => ur.RoleId)
+        builder.Entity<UserRole>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(r => r.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
-
 
         builder.Entity<Order>()
             .HasMany(o => o.OrderLines)
@@ -42,22 +43,6 @@ public class DataContext : IdentityDbContext<User, Role, int,
             .HasOne(ol => ol.MenuItem)
             .WithOne()
             .HasForeignKey<MenuItem>(mi => mi.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Entity<Restaurant>()
-            .HasOne(r => r.Owner)
-            .WithOne()
-            .HasForeignKey<User>(u => u.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Restaurant>()
-            .HasMany(r => r.Orders)
-            .WithOne()
-            .HasForeignKey(o => o.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Restaurant>()
-            .HasOne(r => r.Menu)
-            .WithOne()
-            .HasForeignKey<Menu>(m => m.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Category>()

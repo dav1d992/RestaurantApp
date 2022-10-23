@@ -1,8 +1,16 @@
 [
     {
-        "Username": "Lisaaaa01",
+        "Id": 1,
+        "UserName": "Lisa21",
+        "Gender": "female",
         "FirstName": "Lisa",
-        "LastName": "MoreLisa",
-        "Gender": "female"
+        "LastName": "Johnson"
+    },
+    {
+        "Id": 2,
+        "UserName": "BennyWar",
+        "Gender": "male",
+        "FirstName": "Benny",
+        "LastName": "Allen"
     }
 ]
