@@ -6,7 +6,7 @@ public class Restaurant
     public string Name { get; set; }
     public string ImageURL { get; set; }
     public Address Address { get; set; }
-    public User Owner { get; set; }
+    public string Username { get; set; }
     public int NumberOfTables { get; set; }
     public ICollection<Order> Orders { get; set; }
     public Menu Menu { get; set; }

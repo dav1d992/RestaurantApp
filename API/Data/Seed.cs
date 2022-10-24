@@ -30,13 +30,13 @@ public class Seed
             await userManager.AddToRoleAsync(user, "Member");
         }
 
-        var admin = new User
+        var manager = new User
         {
-            UserName = "admin"
+            UserName = "manager"
         };
 
-        await userManager.CreateAsync(admin, "Pa$$w0rd");
-        await userManager.AddToRolesAsync(admin, new[] { "Admin" });
+        await userManager.CreateAsync(manager, "Pa$$w0rd");
+        await userManager.AddToRolesAsync(manager, new[] { "Manager" });
     }
 
 
